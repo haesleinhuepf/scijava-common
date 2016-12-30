@@ -412,23 +412,35 @@ public class DefaultModuleService extends AbstractService implements
 
 		final HashMap<String, Object> inputMap = new HashMap<>();
 
-		if (values.length % 2 != 0) {
-			log.error("Ignoring extraneous argument: " + values[values.length - 1]);
-		}
-
-		// loop over list of key/value pairs
-		final int numPairs = values.length / 2;
-		for (int i = 0; i < numPairs; i++) {
-			final Object key = values[2 * i];
-			final Object value = values[2 * i + 1];
-			if (!(key instanceof String)) {
-				log.error("Invalid input name: " + key);
-				continue;
+		if (values.length == 1 && values[0] instanceof Map) {
+			Map valueMap = (Map)values[0];
+			for (Object key : valueMap.keySet()) {
+				final Object value = valueMap.get(key);
+				if (!(key instanceof String)) {
+					log.error("Invalid input name: " + key);
+					continue;
+				}
+				final String name = (String) key;
+				inputMap.put(name, value);
 			}
-			final String name = (String) key;
-			inputMap.put(name, value);
-		}
+		} else {
+			if (values.length % 2 != 0) {
+				log.error("Ignoring extraneous argument: " + values[values.length - 1]);
+			}
 
+			// loop over list of key/value pairs
+			final int numPairs = values.length / 2;
+			for (int i = 0; i < numPairs; i++) {
+				final Object key = values[2 * i];
+				final Object value = values[2 * i + 1];
+				if (!(key instanceof String)) {
+					log.error("Invalid input name: " + key);
+					continue;
+				}
+				final String name = (String) key;
+				inputMap.put(name, value);
+			}
+		}
 		return inputMap;
 	}
 
